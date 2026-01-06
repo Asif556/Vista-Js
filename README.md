@@ -1,6 +1,8 @@
 # Vista - The React Framework for Visionaries
 
 
+
+
 > **⚠️ ALPHA SOFTWARE WARNING**
 >
 > Vista is currently in **alpha stage**. It is not recommended for production use yet. APIs and features may change without notice. Use at your own risk.
