@@ -1,0 +1,44 @@
+name: Typescript CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup environment
+      run: |
+        echo "Setting up typescript environment"
+        # Add language-specific setup commands here
+    
+    - name: Install dependencies
+      run: |
+        echo "Installing dependencies"
+        # Add dependency installation commands here
+    
+    - name: Run tests
+      run: |
+        echo "Running tests"
+        # Add test commands here
+    
+    - name: Build application
+      run: |
+        echo "Building application"
+        # Add build commands here
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run security scan
+      run: |
+        echo "Running security scan"
+        # Add security scanning commands here
