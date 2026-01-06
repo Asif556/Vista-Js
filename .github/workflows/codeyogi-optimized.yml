@@ -1,0 +1,140 @@
+yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Lint and format
+        run: |
+          npm run lint
+          npm run format
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
+
+      - name: Security scanning and dependency checks
+        run: |
+          npm audit
+          npm run typecheck
+
+      - name: Build and deploy
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_ENV: production
+        run: |
+          npm run deploy
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Snyk security scan
+        uses: snyk/actions/setup@v1
+        with:
+          token: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk test
+        run: snyk test
+
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Send notification
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: ci-failure
+          client-payload: '{"message": "CI/CD pipeline failed"}'
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.branch == 'main' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to dev environment
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_DEV_API_URL }}
+          NEXT_PUBLIC_ENV: development
+        run: |
+          npm run deploy:dev
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.branch == 'main' }}
+    needs: security-scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to prod environment
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_PROD_API_URL }}
+          NEXT_PUBLIC_ENV: production
+        run: |
+          npm run deploy:prod
+
+  cache:
+    paths:
+      - node_modules/
+    key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+    restore-keys: |
+      ${{ runner.os }}-node-
