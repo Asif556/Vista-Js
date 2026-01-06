@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-01-06T17:33:56.545721",
+  "metadata": {
+    "title": "Vista-Js - The React Framework for Visionaries",
+    "description": "Vista is a modern React framework for building high-performance web applications with Rust-powered core, RSC, and instant HMR.",
+    "keywords": [
+      "React Framework",
+      "Rust-Powered",
+      "High-Performance Web Apps",
+      "Server-Side Rendering",
+      "TypeScript Support"
+    ],
+    "og_title": "Vista-Js - Revolutionizing Web Development",
+    "og_description": "Vista is a modern React framework that combines the best of React and Rust for unparalleled performance and development experience.",
+    "og_type": "website",
+    "twitter_card": "summary_large_image",
+    "canonical_url": "https://vista-js.com",
+    "schema_type": "SoftwareApplication"
+  },
+  "generated_by": "CodeYogi SEO Optimizer"
+}
