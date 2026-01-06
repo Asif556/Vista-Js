@@ -1,0 +1,192 @@
+yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint and format code
+        run: |
+          npm run lint
+          npm run format
+
+      - name: Build and test
+        run: |
+          npm run build
+          npm run test
+
+      - name: Security scanning and dependency checks
+        run: |
+          npm audit
+
+      - name: Deploy to production
+        env:
+          NODE_ENV: production
+        run: |
+          npm run deploy
+
+      - name: Notify on failure
+        if: ${{ failure() }}
+        run: |
+          echo "CI/CD pipeline failed" | mail -s "CI/CD Pipeline Failed" <your-email@example.com>
+```
+However, I noticed some dependencies like eslint, prettier etc are present. I can modify it to include those.
+
+```yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: |
+          npx eslint .
+
+      - name: Run Prettier
+        run: |
+          npx prettier --write .
+
+      - name: Run TypeScript type checking
+        run: |
+          npx tsc --noEmit
+
+      - name: Build and test
+        env:
+          CI: true
+        run: |
+          npm run build
+          npm run test
+
+      - name: Security scanning and dependency checks
+        run: |
+          npm audit
+
+      - name: Notify on failure
+        if: ${{ failure() }}
+        run: |
+          echo "CI/CD pipeline failed" | mail -s "CI/CD Pipeline Failed" <your-email@example.com>
+```
+But Next.js and turbo can be included for optimization.
+
+```yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: |
+          npx eslint .
+
+      - name: Run Prettier
+        run: |
+          npx prettier --write .
+
+      - name: Run TypeScript type checking
+        run: |
+          npx tsc --noEmit
+
+      - name: Turbo build and test
+        env:
+          CI: true
+        run: |
+          npm run build
+          npm run test
+
+      - name: Security scanning and dependency checks
+        run: |
+          npm audit
+
+      - name: Notify on failure
+        if: ${{ failure() }}
+        run: |
+          echo "CI/CD pipeline failed" | mail -s "CI/CD Pipeline Failed" <your-email@example.com>
