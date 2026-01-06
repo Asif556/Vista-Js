@@ -1,6 +1,6 @@
-# Vista - React Framework for High-Performance Web Apps
+# Vista-Js - The React Framework for Visionaries
 
-Vista is a modern React framework for building fast, scalable web applications. It combines React with Rust for unparalleled performance and development experience.
+Vista is a modern React framework for building high-performance web applications with Rust-powered core, RSC, and instant HMR.
 
 ## 🏆 Key Features
 
@@ -29,7 +29,7 @@ For comprehensive documentation, visit our [Wiki](../../wiki) or explore the `do
 
 ## 🛠️ Technologies
 
-React framework, high-performance web apps, Rust-powered, server-side rendering, hot module replacement
+React Framework, Rust-Powered, High-Performance Web Apps, Server-Side Rendering, TypeScript Support
 
 ## 🤝 Contributing
 
